@@ -1,0 +1,61 @@
+[
+  {
+    "id": "birthday_standard",
+    "name": "Standard-Geburtstagsbrief (AWO Oberlar)",
+    "description": "Standard-Geburtstagsbrief mit Gutschein für das Sonntagscafé",
+    "template_file": "letter_template.html",
+    "required_columns": [
+      "Geburtsdatum",
+      "Briefanrede",
+      "Vorname",
+      "Nachname",
+      "Straße",
+      "Postleitzahl",
+      "Ort"
+    ],
+    "date_column": "Geburtsdatum",
+    "salutation_column": "Briefanrede",
+    "theme": "theme-red",
+    "subject": "Herzlichen Glückwunsch zum Geburtstag!",
+    "paragraphs": [
+      "wir wünschen [Dir/Ihnen] alles Gute zum Geburtstag. Möge [Dir/Ihnen] das neue Lebensjahr Glück, Gesundheit sowie viele schöne Momente bringen!",
+      "Als kleines Geburtstagsgeschenk [erhältst/erhalten] gegen Vorlage dieses Schreibens in unserem Sonntagscafé [deinen/Ihren] \"Geburtstagskuchen + Kaffee\"."
+    ],
+    "poem": [
+      "Voll Fröhlichkeit und Sonnenschein",
+      "soll heute [Dein/Ihr] Geburtstag sein.",
+      "Und außerdem sei wunderbar,",
+      "[Dein/Ihr] weiteres neues Lebensjahr!"
+    ],
+    "closing_headline": "Ein schönes und vor allem gesundes neues Lebensjahr",
+    "closing_wishes": "wünscht herzlichst",
+    "assets": {
+      "watermark_image": "static/images/birthday_watermark2.png",
+      "logo_image": "static/images/logo.jpg",
+      "signature_image": "static/images/signature.png"
+    }
+  },
+  {
+    "id": "urkunde_standard",
+    "name": "Urkunde (AWO Oberlar)",
+    "description": "Urkunde für besondere Verdienste oder Mitgliedschaft",
+    "template_file": "letter_template.html",
+    "required_columns": [
+      "Vorname",
+      "Nachname"
+    ],
+    "salutation_column": "Briefanrede",
+    "theme": "theme-gold",
+    "subject": "URKUNDE",
+    "paragraphs": [
+      "Wir verleihen [Dir/Ihnen] diese Urkunde als Zeichen unserer besonderen Anerkennung und Dankbarkeit für [Dein/Ihr] Engagement.",
+      "Vielen Dank für die Unterstützung und Treue zu unserer Organisation!"
+    ],
+    "closing_headline": "AWO Oberlar e. V.",
+    "closing_wishes": "Der Vorstand",
+    "assets": {
+      "logo_image": "static/images/logo.jpg",
+      "signature_image": "static/images/signature.png"
+    }
+  }
+]

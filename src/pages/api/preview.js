@@ -25,11 +25,14 @@ export default async function handler(req, res) {
     if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
     fs.writeFileSync(uploadPath, buffer);
 
+    const templateId = req.headers['x-template-id'] || 'birthday_standard';
+
     // Call FastAPI preview endpoint
-    const fastApiResponse = await fetch('http://localhost:8000/preview_csv', {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+    const fastApiResponse = await fetch(`${backendUrl}/preview_csv`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file_path: uploadPath, n_rows: 10 }),
+      body: JSON.stringify({ file_path: uploadPath, template_id: templateId, n_rows: 10 }),
     });
 
     const data = await fastApiResponse.json();

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 export default function FileUploader() {
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
@@ -9,6 +11,43 @@ export default function FileUploader() {
   const [filePath, setFilePath] = useState('');
   const currentYear = useMemo(() => new Date().getFullYear(), []);
   const [letterYear, setLetterYear] = useState(currentYear);
+  const [customSubject, setCustomSubject] = useState('');
+  const [customParagraphs, setCustomParagraphs] = useState([]);
+
+  // Fetch available templates on load
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const res = await fetch('/api/templates');
+        if (res.ok) {
+          const data = await res.json();
+          setTemplates(data);
+          if (data.length > 0) {
+            setSelectedTemplateId(data[0].id);
+          }
+        }
+      } catch (err) {
+        console.error('Fehler beim Laden der Vorlagen:', err);
+      }
+    };
+    fetchTemplates();
+  }, []);
+
+  const selectedTemplate = useMemo(() => {
+    return templates.find((t) => t.id === selectedTemplateId) || null;
+  }, [templates, selectedTemplateId]);
+
+  // Sync editor fields with the chosen template defaults
+  useEffect(() => {
+    if (selectedTemplate) {
+      setCustomSubject(selectedTemplate.subject || '');
+      setCustomParagraphs(selectedTemplate.paragraphs || []);
+    } else {
+      setCustomSubject('');
+      setCustomParagraphs([]);
+    }
+  }, [selectedTemplate]);
+
   const requiredOk = useMemo(() => {
     if (!preview?.required_columns) return false;
     return Object.values(preview.required_columns).every(Boolean);
@@ -16,32 +55,55 @@ export default function FileUploader() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !selectedTemplateId) return;
 
     setUploading(true);
+    setMessage('');
     try {
-      const response = await fetch('/api/upload', {
+      const customSubjectB64 = btoa(unescape(encodeURIComponent(customSubject)));
+      const customParagraphsB64 = btoa(unescape(encodeURIComponent(JSON.stringify(customParagraphs))));
+
+      const response = await fetch(`/api/upload?year=${letterYear}&templateId=${selectedTemplateId}&customSubject=${customSubjectB64}&customParagraphs=${customParagraphsB64}`, {
         method: 'POST',
         headers: {
           'X-File-Name': file.name,
           'X-Letter-Year': String(letterYear),
+          'X-Template-Id': selectedTemplateId,
+          'X-Custom-Subject': customSubjectB64,
+          'X-Custom-Paragraphs': customParagraphsB64,
         },
         body: file,
       });
 
-  const blob = await response.blob();
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData?.error || 'Fehler beim Erstellen der PDF');
+      }
+
+      const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
-      window.location.href = blobUrl;
-  setMessage('Upload erfolgreich. PDF wird geöffnet.');
+      
+      // Dynamic link download to bypass browser navigation blocks
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `Briefe_${letterYear}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up blob URL after a short delay
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+
+      setMessage('PDF erfolgreich erstellt und heruntergeladen.');
     } catch (error) {
-      setMessage('Upload failed: ' + error.message);
+      setMessage('Fehler: ' + error.message);
     } finally {
       setUploading(false);
     }
   };
 
   const handlePreview = async () => {
-    if (!file) return;
+    if (!file || !selectedTemplateId) return;
     setUploading(true);
     setMessage('');
     try {
@@ -49,12 +111,13 @@ export default function FileUploader() {
         method: 'POST',
         headers: {
           'X-File-Name': file.name,
+          'X-Template-Id': selectedTemplateId,
         },
         body: file,
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data?.error || 'Preview failed');
+        throw new Error(data?.error || 'Vorschau fehlgeschlagen');
       }
       setPreview(data);
       setFilePath(data.file_path);
@@ -67,26 +130,144 @@ export default function FileUploader() {
     }
   };
 
+  // Re-run preview when file or selected template changes
   useEffect(() => {
-    if (file) {
+    if (file && selectedTemplateId) {
       handlePreview();
     } else {
       setPreview(null);
       setFilePath('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file]);
+  }, [file, selectedTemplateId]);
+
+  const themeColors = {
+    'theme-red': '#ef4444',
+    'theme-blue': '#3b82f6',
+    'theme-green': '#10b981',
+    'theme-gold': '#d97706',
+  };
+  const themeLightColors = {
+    'theme-red': '#fee2e2',
+    'theme-blue': '#dbeafe',
+    'theme-green': '#d1fae5',
+    'theme-gold': '#fef3c7',
+  };
+  const activeColor = themeColors[selectedTemplate?.theme] || '#4361ee';
+  const activeLightColor = themeLightColors[selectedTemplate?.theme] || '#e0e7ff';
 
   return (
-    <div className="upload-card">
+    <div className="upload-card" style={{ '--primary': activeColor, '--primary-light': activeLightColor }}>
       <div className="upload-header">
-        <h2 className="upload-title">AWO Geburtstagsbriefe erstellen</h2>
-        <p className="upload-subtitle">Excel Export als .csv Datei aus ZMAV hier hochladen</p>
+        <h2 className="upload-title">AWO Brief-Generator</h2>
+        <p className="upload-subtitle">Wählen Sie eine Vorlage und laden Sie die CSV-Datei hoch</p>
       </div>
-      {/* Schritt 1: Datei auswählen */}
+
+      {/* Schritt 1: Vorlage auswählen */}
       <section className="step">
         <div className="step-header">
           <span className="step-number">1</span>
+          <h3 className="step-title">Vorlage auswählen</h3>
+        </div>
+        <div className="step-body">
+          <select
+            className="year-select"
+            style={{ width: '100%', padding: '0.6rem', fontSize: '0.9rem', background: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', color: '#374151' }}
+            value={selectedTemplateId}
+            onChange={(e) => setSelectedTemplateId(e.target.value)}
+            disabled={uploading || templates.length === 0}
+          >
+            {templates.length === 0 ? (
+              <option>Lade Vorlagen...</option>
+            ) : (
+              templates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))
+            )}
+          </select>
+          {selectedTemplate?.description && (
+            <p className="upload-subtitle" style={{ marginTop: '0.4rem', fontStyle: 'italic' }}>
+              {selectedTemplate.description}
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Schritt 2: Brieftext anpassen (Optional) */}
+      <section className="step">
+        <div className="step-header">
+          <span className="step-number">2</span>
+          <h3 className="step-title">Brieftext anpassen (Optional)</h3>
+        </div>
+        <div className="step-body">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '6px', color: '#4a5568' }}>
+                Betreffzeile (Subject):
+              </label>
+              <input 
+                type="text" 
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #cbd5e0',
+                  borderRadius: '6px',
+                  fontFamily: 'inherit',
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  color: '#2d3748',
+                  outline: 'none',
+                  transition: 'border-color 0.2s'
+                }}
+                value={customSubject} 
+                onChange={(e) => setCustomSubject(e.target.value)} 
+                disabled={uploading}
+              />
+            </div>
+
+            {customParagraphs.map((para, idx) => (
+              <div key={idx}>
+                <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '6px', color: '#4a5568' }}>
+                  Absatz {idx + 1}:
+                </label>
+                <textarea
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #cbd5e0',
+                    borderRadius: '6px',
+                    fontFamily: 'inherit',
+                    fontSize: '14px',
+                    backgroundColor: '#fff',
+                    color: '#2d3748',
+                    outline: 'none',
+                    resize: 'vertical',
+                    transition: 'border-color 0.2s'
+                  }}
+                  value={para}
+                  onChange={(e) => {
+                    const newParas = [...customParagraphs];
+                    newParas[idx] = e.target.value;
+                    setCustomParagraphs(newParas);
+                  }}
+                  disabled={uploading}
+                />
+                <div style={{ fontSize: '11px', color: '#718096', marginTop: '4px' }}>
+                  Hinweis: Du kannst Platzhalter wie <code>[Dir/Ihnen]</code>, <code>[Dein/Ihr]</code>, <code>[erhältst/erhalten]</code> oder <code>[deinen/Ihren]</code> verwenden, die automatisch für jeden Empfänger angepasst werden.
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Schritt 3: Datei auswählen */}
+      <section className="step">
+        <div className="step-header">
+          <span className="step-number">3</span>
           <h3 className="step-title">Datei auswählen</h3>
         </div>
         <div className="step-body">
@@ -134,12 +315,12 @@ export default function FileUploader() {
           </div>
         </div>
       </section>
-      {/* Vorschau erscheint automatisch nach Dateiauswahl */}
-      {/* Schritt 2: Vorschau der Pflichtfelder (sichtbar nach Dateiauswahl) */}
+
+      {/* Schritt 4: Vorschau der Pflichtfelder */}
       {preview && (
         <section className="step">
           <div className="step-header">
-            <span className="step-number">2</span>
+            <span className="step-number">4</span>
             <h3 className="step-title">Vorschau der Pflichtfelder</h3>
           </div>
           <div className="step-body">
@@ -171,17 +352,9 @@ export default function FileUploader() {
               </div>
               {preview.required_columns && (
                 <div style={{ marginTop: 8 }}>
-                  <strong>Pflichtspalten:</strong>
+                  <strong>Pflichtspalten Status:</strong>
                   <div className="preview-required">
-                    {(preview.required_columns_order || [
-                      'Geburtsdatum',
-                      'Briefanrede',
-                      'Vorname',
-                      'Nachname',
-                      'Straße',
-                      'Postleitzahl',
-                      'Ort',
-                    ]).map((name) => {
+                    {(preview.required_columns_order || []).map((name) => {
                       const ok = preview.required_columns?.[name] ?? false;
                       return (
                         <span key={name} className={`badge ${ok ? 'ok' : 'error'}`}>
@@ -197,17 +370,17 @@ export default function FileUploader() {
         </section>
       )}
 
-      {/* Schritt 3: Jahr auswählen (sichtbar nach Vorschau) */}
-      {preview && (
-        <section className='step'>
-          <div className='step-header'>
-            <span className='step-number'>3</span>
-            <h3 className='step-title'>Jahr auswählen</h3>
+      {/* Schritt 5: Jahr auswählen (nur sichtbar wenn die Vorlage ein Datumsfeld benötigt) */}
+      {preview && selectedTemplate?.date_column && (
+        <section className="step">
+          <div className="step-header">
+            <span className="step-number">5</span>
+            <h3 className="step-title">Jahr auswählen</h3>
           </div>
-          <div className='step-body'>
-            <div className='year-input'>
+          <div className="step-body">
+            <div className="year-input">
               <select
-                className='year-select'
+                className="year-select"
                 disabled={uploading}
                 value={letterYear}
                 onChange={(e) => setLetterYear(Number(e.target.value))}
@@ -220,11 +393,11 @@ export default function FileUploader() {
         </section>
       )}
 
-      {/* Schritt 4: PDF erstellen (sichtbar nach Vorschau) */}
+      {/* Schritt 6: PDF erstellen */}
       {preview && (
         <section className="step">
           <div className="step-header">
-            <span className="step-number">4</span>
+            <span className="step-number">{selectedTemplate?.date_column ? 6 : 5}</span>
             <h3 className="step-title">PDF erstellen</h3>
           </div>
           <div className="step-body">
@@ -236,22 +409,26 @@ export default function FileUploader() {
               {uploading ? (
                 <>
                   <span className="spinner"></span>
-                  Wird hochgeladen...
+                  Wird verarbeitet...
                 </>
               ) : (
-                'Hochladen und PDF erstellen ...'
+                'Dokumente generieren (PDF)'
               )}
             </button>
             {!requiredOk && (
               <div className="status-message error" style={{ marginTop: '8px' }}>
-                Es fehlen Pflichtspalten in der CSV. Bitte korrigieren Sie die Datei.
+                Es fehlen Pflichtspalten in der CSV für die gewählte Vorlage.
               </div>
             )}
           </div>
         </section>
       )}
 
-  {message && <div className="status-message">{message}</div>}
+      {message && (
+        <div className={`status-message ${message.startsWith('Fehler') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
     </div>
   );
 }

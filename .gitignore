@@ -1,7 +1,39 @@
-.venv
-.next
-*.pyc
-node_modules
-uploads
-.vscode
-fastapi/output.pdf
+# Node.js
+node_modules/
+.next/
+out/
+build/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp*
+.pnp.js
+
+# Python
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# FastAPI Temp PDFs & Outputs
+*.pdf
+fast_api/*.pdf
+fast_api/temp_*.pdf
+
+# User Uploaded Data (GDPR Compliance)
+uploads/*
+!uploads/.gitkeep
+
+# Editor & System Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

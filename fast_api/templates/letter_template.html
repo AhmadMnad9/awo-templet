@@ -5,146 +5,290 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geburtstagsbrief</title>
     <style>
-        * { margin: 0; padding: 0; }
-        html, body {
-            font-family: Verdana, sans-serif;
-            font-size: 22px;
+        /* Global Page Setup - DIN 5008 compliant A4 */
+        @page {
+            size: A4;
+            margin: 0;
         }
-        .page{
-            width: 220mm;
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #000000;
+            background-color: #ffffff;
+            width: 210mm;
+            height: 297mm;
+        }
+
+        .page {
+            width: 210mm;
             height: 297mm;
             position: relative;
-            margin: 25mm;
+            background: #ffffff;
+            overflow: hidden;
+            
+            /* Default Red Theme Accent */
+            --accent-color: #e30613;
         }
-        .header {
-            font-size: 60%;
+
+        /* Visual Themes */
+        .page.theme-red {
+            --accent-color: #e30613; /* AWO Red */
+        }
+        .page.theme-blue {
+            --accent-color: #2980b9; /* Royal Blue */
+        }
+        .page.theme-gold {
+            --accent-color: #d4af37; /* Elegant Gold */
+        }
+        .page.theme-green {
+            --accent-color: #27ae60; /* Forest Green */
+        }
+
+        /* Logo (Top Right) */
+        .logo-container {
             position: absolute;
-            top: 45mm;  /* Position im Fensterbereich */
-            width: 100mm;
+            top: 50mm;
+            right: 20mm;
+            width: 55mm;
+            text-align: right;
+            z-index: 2;
         }
-        .address {
+
+        .logo-container img {
+            width: 100%;
+            height: auto;
+            max-height: 20mm;
+            object-fit: contain;
+        }
+
+        /* Anschriftfeld (Address Field) - DIN 5008 Standard */
+        .address-field {
             position: absolute;
-            top: 52mm;  /* Position im Fensterbereich */
-            width: 100mm;
+            top: 45mm;
+            left: 20mm;
+            width: 85mm;
+            height: 45mm;
+            padding-top: 2mm;
+            z-index: 2;
         }
-        .date {
-            position:absolute;
-            top: 115mm;
-            right: 0;
+
+        /* Small sender line above address */
+        .sender-small-line {
+            font-size: 7.5pt;
+            color: #555555;
+            border-bottom: 0.5px solid #cccccc;
+            padding-bottom: 1.5mm;
+            margin-bottom: 2mm;
+            white-space: nowrap;
         }
+
+        /* Recipient address */
+        .recipient-address {
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+
+        /* Date - Right aligned */
+        .date-zone {
+            position: absolute;
+            top: 95mm;
+            right: 20mm;
+            font-size: 11pt;
+            text-align: right;
+            z-index: 2;
+        }
+
+        /* Subject Line (Betreff) - DIN 5008 starts at 103.7mm */
+        .subject-zone {
+            position: absolute;
+            top: 103.7mm;
+            left: 20mm;
+            right: 20mm;
+            font-size: 11pt;
+            font-weight: bold;
+            color: var(--accent-color);
+            z-index: 2;
+        }
+
+        /* Main Content - Starts at 120mm */
+        .body-zone {
+            position: absolute;
+            top: 120mm;
+            left: 20mm;
+            right: 20mm;
+            z-index: 2;
+        }
+
         .salutation {
             font-weight: bold;
-            position: absolute;
-            top: 125mm;
+            margin-bottom: 4mm;
         }
-        .after-salutation-text{
-            position: absolute;
-            top: 140mm;
-            min-width: 160mm;
+
+        .letter-content p {
+            margin-bottom: 4mm;
+            text-align: justify;
         }
+
+        /* Poem Section (Italic, dark gray, side accents via theme color) */
         .poem {
             font-weight: bold;
+            font-style: italic;
+            color: #555555;
             text-align: center;
-            margin-top: 20mm;
-            margin-bottom: 20mm;
+            margin: 6mm 0;
+            line-height: 1.5;
+            border-left: 3px solid var(--accent-color);
+            border-right: 3px solid var(--accent-color);
+            padding: 0 4mm;
         }
-        .watermark-image{
-            position: absolute;
-            top: 110mm;
-        }
-        .watermark-image img{
-            width: 800px;
-        }
+
         .closing {
-            margin-top: 10mm;
-            margin-bottom: 20mm;
+            margin-top: 6mm;
+            margin-bottom: 4mm;
         }
-        .signature {
-            margin-top: 5mm;
+
+        .signature-area {
+            margin-top: -15px; /* Negative margin to overlap with text above */
+            position: relative;
+            z-index: 10;
+        }
+
+        .signature-image {
+            width: 140px;
+            height: auto;
+            display: block;
+            background: transparent;
+            mix-blend-mode: multiply; /* Blends white signature background with page */
             margin-bottom: 2mm;
         }
-        .page-break { page-break-after: always; }
 
-        /* Faltmarken */
-        .fold-mark {
+        /* Watermark Background */
+        .watermark-container {
             position: absolute;
-            width: 10mm;
-            border-top: 1px solid #aaa;
-            left: -25mm;
+            top: 115mm;
+            left: 40mm;
+            width: 130mm;
+            opacity: 0.85; /* Uses the image's embedded opacity for a realistic look */
+            z-index: 1;
+            pointer-events: none;
         }
-        .fold-mark.top {
-            top: 110mm; /* Position für obere Faltmarke (Mitte des Briefs) */
+
+        .watermark-container img {
+            width: 100%;
+            height: auto;
         }
-        img {
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
+
+        /* DIN 5008 Marks */
+        .din-mark {
+            position: absolute;
+            left: 0;
+            border-top: 0.5px solid #cccccc;
+            z-index: 100;
+        }
+
+        .fold-mark-1 {
+            top: 105mm;
+            width: 4mm;
+        }
+
+        .fold-mark-2 {
+            top: 200mm;
+            width: 4mm;
+        }
+
+        .punch-mark {
+            top: 148.5mm;
+            width: 6mm;
+            border-top-color: #999999;
+        }
+
+        .page-break {
+            page-break-after: always;
         }
     </style>
 </head>
 <body>
-    <div class="page">
-        <!-- Faltmarken -->
-        <div class="fold-mark top">
-            <span class="fold-mark-label"></span>
+    <div class="page {{ theme|default('theme-red') }}{% if not last_page %} page-break{% endif %}">
+        <!-- DIN 5008 Folding & Punching Marks -->
+        <div class="din-mark fold-mark-1"></div>
+        <div class="din-mark punch-mark"></div>
+        <div class="din-mark fold-mark-2"></div>
+
+        <!-- Senders Logo (Top Right) -->
+        <div class="logo-container">
+            <img src="data:image/png;base64,{{ logo_image }}" alt="AWO Logo">
         </div>
 
-        <!-- Absender -->
-        <div class="header">
-            AWO Oberlar e. V. • Sieglarer Str. 66-68 • 53842 Troisdorf
+        <!-- Watermark Background -->
+        {% if watermark_image %}
+        <div class="watermark-container">
+            <img src="data:image/png;base64,{{ watermark_image }}" alt="Watermark">
         </div>
-        
-        <!-- Empfängeradresse -->
-        <div class="address">
-            {{ row.Anrede }}<br>
-            {{ row.Vorname }} {{ row.Nachname }}<br>
-            {{ row.Straße }}<br>
-            {{ row.Postleitzahl }} {{ row.Ort }}
-        </div>
-        
-        <!-- Wasserzeichen -->
-        <div class="watermark-image">
-            <img src="data:image/png;base64,{{ watermark_image }}">
-        </div>
-        
-        <!-- Logo -->
-        <div style="text-align: right;">
-            <img src="data:image/png;base64,{{ logo_image }}" style="width:300px;">
-        </div>
+        {% endif %}
 
-        <!-- Ort und Datum -->
-        <div class="date">
-            Troisdorf, {% if row.GeburtsdatumInJahr %}{{ row.GeburtsdatumInJahr.strftime('%d.%m.%Y') }}{% elif row.Geburtsdatum %}{{ row.Geburtsdatum.strftime('%d.%m.') }}{{ year }}{% else %}Datum{% endif %}
-        </div>
-        
-
-        <!-- Anrede und Haupttext -->
-        <div class="salutation">
-            {{ row.Briefanrede }},
-        </div>
-        <div class="after-salutation-text">
-            wir wünschen {{ salutation_list[1] }} alles Gute zum Geburtstag. Möge {{ salutation_list[1] }} das neue Lebensjahr Glück, 
-            Gesundheit sowie viele schöne Momente bringen!
-            <!-- Gedicht -->
-            <div class="poem">
-                Voll Fröhlichkeit und Sonnenschein<br>
-                soll heute {{ salutation_list[2] }} Geburtstag sein.<br>
-                Und außerdem sei wunderbar,<br>
-                {{ salutation_list[2] }} weiteres neues Lebensjahr!
-            </div> 
-            <!-- Geschenkinformation -->
-            <p>
-                Als kleines Geburtstagsgeschenk {{ salutation_list[0] }} gegen Vorlage dieses Schreibens in unserem 
-                Sonntagscafe {{ salutation_list[3] }} „Geburtstagskuchen + Kaffee".
-            </p>
-
-            <div class="closing">
-                <p><strong>Ein schönes und vor allem gesundes neues Lebensjahr</strong></p>
-                
+        <!-- DIN 5008 Anschriftfeld (Address Zone) -->
+        <div class="address-field">
+            <!-- Small sender line for window envelope -->
+            <div class="sender-small-line">
+                AWO Oberlar e. V. • Sieglarer Str. 66-68 • 53842 Troisdorf
             </div>
+            <!-- Recipient's Address -->
+            <div class="recipient-address">
+                {% if row.Anrede %}{{ row.Anrede }} {% endif %}{{ row.Vorname }} {{ row.Nachname }}<br>
+                {{ row.Straße }}<br>
+                {{ row.Postleitzahl }} {{ row.Ort }}
+            </div>
+        </div>
+
+        <!-- Ort und Datum (Date Zone) -->
+        <div class="date-zone">
+            Troisdorf, {{ row.formatted_date }}
+        </div>
+
+        <!-- Betreffzeile (Subject Zone) -->
+        <div class="subject-zone">
+            {{ subject }}
+        </div>
+
+        <!-- Briefinhalt (Body Zone) -->
+        <div class="body-zone">
+            <div class="salutation">
+                {{ row.Briefanrede }},
+            </div>
+            
+            <div class="letter-content">
+                {% for p in paragraphs %}
+                <p>{{ p }}</p>
+                {% endfor %}
+
+                {% if poem %}
+                <!-- Poem Section -->
+                <div class="poem">
+                    {% for line in poem %}
+                        {{ line }}{% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Closing Section -->
+            {% if closing_headline %}
+            <div class="closing">
+                <p><strong>{{ closing_headline }}</strong></p>
+            </div>
+            {% endif %}
             <p>
-                wünscht herzlichst<br>
-                <div class="signature">
-                    <img src="data:image/png;base64,{{ signature_image }}" style="width:140px">
+                {{ closing_wishes }}<br>
+                <div class="signature-area">
+                    <img class="signature-image" src="data:image/png;base64,{{ signature_image }}" alt="Unterschrift">
                 </div>
                 Birgit Biegel<br>
                 Vorsitzende
@@ -153,4 +297,3 @@
     </div>
 </body>
 </html>
-<div class="{% if not last_page %} page-break {% endif %}"></div>

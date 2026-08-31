@@ -38,10 +38,10 @@ const styles = StyleSheet.create({
     top: mmToPt(200),
     width: mmToPt(3.5),
   },
-  // Logo top right
+  // Logo top right (Briefkopf at very top of page)
   logoContainer: {
     position: 'absolute',
-    top: mmToPt(50),
+    top: mmToPt(15),
     right: mmToPt(20),
     width: mmToPt(55),
   },

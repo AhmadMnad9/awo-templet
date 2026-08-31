@@ -23,26 +23,20 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
     color: '#000000',
   },
-  // DIN 5008 folding and punching marks
+  // DIN 5008 folding marks (small & delicate)
   dinMark: {
     position: 'absolute',
     left: 0,
-    height: 1,
-    backgroundColor: '#333333',
+    height: 0.5,
+    backgroundColor: '#777777',
   },
   foldMark1: {
     top: mmToPt(105),
-    width: mmToPt(6),
+    width: mmToPt(3.5),
   },
   foldMark2: {
     top: mmToPt(200),
-    width: mmToPt(6),
-  },
-  punchMark: {
-    top: mmToPt(148.5),
-    width: mmToPt(8),
-    height: 1.2,
-    backgroundColor: '#333333',
+    width: mmToPt(3.5),
   },
   // Logo top right
   logoContainer: {
@@ -251,9 +245,8 @@ const Brief = ({ row, templateConfig, data, year, index, total }) => {
         </View>
       )}
 
-      {/* DIN 5008 Marks (Fold 1, Hole Punch, Fold 2) */}
+      {/* DIN 5008 Folding Marks */}
       <View style={[styles.dinMark, styles.foldMark1]} />
-      <View style={[styles.dinMark, styles.punchMark]} />
       <View style={[styles.dinMark, styles.foldMark2]} />
 
       {/* Logo Top Right */}

@@ -1,8 +1,23 @@
 FROM python:3.12-slim
 
-# Install wkhtmltopdf and its runtime dependencies
+# Install wkhtmltopdf dependencies, patched-Qt package, and Liberation fonts (for Arial compatibility)
 RUN apt-get update && apt-get install -y \
-    wkhtmltopdf \
+    curl \
+    fontconfig \
+    libfreetype6 \
+    libjpeg62-turbo \
+    libpng16-16 \
+    libx11-6 \
+    libxcb1 \
+    libxext6 \
+    libxrender1 \
+    xfonts-75dpi \
+    xfonts-base \
+    fonts-liberation \
+    && curl -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
+    && dpkg -i wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
+    || apt-get install -fy \
+    && rm wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -49,6 +49,20 @@ graph TD
 
 ---
 
+### 💻 Automatische Einrichtung & Start (Empfohlen)
+
+Sie können das gesamte Projekt (Frontend und Backend) mit einem einzigen Befehl starten. Das Skript `run.py` prüft und erstellt automatisch die virtuelle Python-Umgebung, installiert alle Backend- und Frontend-Abhängigkeiten und startet beide Server parallel:
+
+```bash
+python run.py
+```
+
+Das Frontend ist dann unter `http://localhost:3000` erreichbar, das Backend unter `http://localhost:8000`. Beenden Sie beide Dienste mit `Ctrl + C`.
+
+---
+
+### 🛠️ Manueller Start (Alternativ)
+
 ### 1. Backend starten (FastAPI)
 
 1. Navigieren Sie in den Ordner `fast_api`:

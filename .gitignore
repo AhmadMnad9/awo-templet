@@ -29,6 +29,7 @@ fast_api/temp_*.pdf
 # User Uploaded Data (GDPR Compliance)
 uploads/*
 !uploads/.gitkeep
+test_members.csv
 
 # Editor & System Files
 .vscode/

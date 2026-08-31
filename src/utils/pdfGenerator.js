@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
   dinMark: {
     position: 'absolute',
     left: 0,
-    borderTopWidth: 0.5,
-    borderTopColor: '#cccccc',
+    height: 0.75,
+    backgroundColor: '#888888',
   },
   foldMark1: {
     top: mmToPt(105),
@@ -41,7 +41,8 @@ const styles = StyleSheet.create({
   punchMark: {
     top: mmToPt(148.5),
     width: mmToPt(6),
-    borderTopColor: '#999999',
+    height: 1,
+    backgroundColor: '#555555',
   },
   // Logo top right
   logoContainer: {
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     top: mmToPt(115),
     left: mmToPt(40),
     width: mmToPt(130),
-    opacity: 0.12, // subtle opacity
+    opacity: 0.85, // clear watermark visibility
   },
   watermark: {
     width: '100%',

@@ -27,22 +27,22 @@ const styles = StyleSheet.create({
   dinMark: {
     position: 'absolute',
     left: 0,
-    height: 0.75,
-    backgroundColor: '#888888',
+    height: 1,
+    backgroundColor: '#333333',
   },
   foldMark1: {
     top: mmToPt(105),
-    width: mmToPt(4),
+    width: mmToPt(6),
   },
   foldMark2: {
     top: mmToPt(200),
-    width: mmToPt(4),
+    width: mmToPt(6),
   },
   punchMark: {
     top: mmToPt(148.5),
-    width: mmToPt(6),
-    height: 1,
-    backgroundColor: '#555555',
+    width: mmToPt(8),
+    height: 1.2,
+    backgroundColor: '#333333',
   },
   // Logo top right
   logoContainer: {
@@ -244,17 +244,17 @@ const Brief = ({ row, templateConfig, data, year, index, total }) => {
 
   return (
     <Page size="A4" style={styles.page}>
-      {/* DIN 5008 Marks */}
-      <View style={[styles.dinMark, styles.foldMark1]} />
-      <View style={[styles.dinMark, styles.punchMark]} />
-      <View style={[styles.dinMark, styles.foldMark2]} />
-
       {/* Watermark Background */}
       {watermarkUri && (
         <View style={styles.watermarkContainer}>
           <Image style={styles.watermark} src={watermarkUri} />
         </View>
       )}
+
+      {/* DIN 5008 Marks (Fold 1, Hole Punch, Fold 2) */}
+      <View style={[styles.dinMark, styles.foldMark1]} />
+      <View style={[styles.dinMark, styles.punchMark]} />
+      <View style={[styles.dinMark, styles.foldMark2]} />
 
       {/* Logo Top Right */}
       {logoUri && (

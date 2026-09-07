@@ -195,79 +195,10 @@ export default function FileUploader() {
         </div>
       </section>
 
-      {/* Schritt 2: Brieftext anpassen (Optional) */}
+      {/* Schritt 2: Datei auswählen */}
       <section className="step">
         <div className="step-header">
           <span className="step-number">2</span>
-          <h3 className="step-title">Brieftext anpassen (Optional)</h3>
-        </div>
-        <div className="step-body">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div>
-              <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '6px', color: '#4a5568' }}>
-                Betreffzeile (Subject):
-              </label>
-              <input 
-                type="text" 
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #cbd5e0',
-                  borderRadius: '6px',
-                  fontFamily: 'inherit',
-                  fontSize: '14px',
-                  backgroundColor: '#fff',
-                  color: '#2d3748',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                value={customSubject} 
-                onChange={(e) => setCustomSubject(e.target.value)} 
-                disabled={uploading}
-              />
-            </div>
-
-            {customParagraphs.map((para, idx) => (
-              <div key={idx}>
-                <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '6px', color: '#4a5568' }}>
-                  Absatz {idx + 1}:
-                </label>
-                <textarea
-                  rows={3}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #cbd5e0',
-                    borderRadius: '6px',
-                    fontFamily: 'inherit',
-                    fontSize: '14px',
-                    backgroundColor: '#fff',
-                    color: '#2d3748',
-                    outline: 'none',
-                    resize: 'vertical',
-                    transition: 'border-color 0.2s'
-                  }}
-                  value={para}
-                  onChange={(e) => {
-                    const newParas = [...customParagraphs];
-                    newParas[idx] = e.target.value;
-                    setCustomParagraphs(newParas);
-                  }}
-                  disabled={uploading}
-                />
-                <div style={{ fontSize: '11px', color: '#718096', marginTop: '4px' }}>
-                  Hinweis: Du kannst Platzhalter wie <code>[Dir/Ihnen]</code>, <code>[Dein/Ihr]</code>, <code>[erhältst/erhalten]</code> oder <code>[deinen/Ihren]</code> verwenden, die automatisch für jeden Empfänger angepasst werden.
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Schritt 3: Datei auswählen */}
-      <section className="step">
-        <div className="step-header">
-          <span className="step-number">3</span>
           <h3 className="step-title">Datei auswählen</h3>
         </div>
         <div className="step-body">
@@ -316,11 +247,11 @@ export default function FileUploader() {
         </div>
       </section>
 
-      {/* Schritt 4: Vorschau der Pflichtfelder */}
+      {/* Schritt 3: Vorschau der Pflichtfelder */}
       {preview && (
         <section className="step">
           <div className="step-header">
-            <span className="step-number">4</span>
+            <span className="step-number">3</span>
             <h3 className="step-title">Vorschau der Pflichtfelder</h3>
           </div>
           <div className="step-body">
@@ -370,11 +301,11 @@ export default function FileUploader() {
         </section>
       )}
 
-      {/* Schritt 5: Jahr auswählen (nur sichtbar wenn die Vorlage ein Datumsfeld benötigt) */}
+      {/* Schritt 4: Jahr auswählen (nur sichtbar wenn die Vorlage ein Datumsfeld benötigt) */}
       {preview && selectedTemplate?.date_column && (
         <section className="step">
           <div className="step-header">
-            <span className="step-number">5</span>
+            <span className="step-number">4</span>
             <h3 className="step-title">Jahr auswählen</h3>
           </div>
           <div className="step-body">
@@ -393,11 +324,11 @@ export default function FileUploader() {
         </section>
       )}
 
-      {/* Schritt 6: PDF erstellen */}
+      {/* Schritt 5: PDF erstellen */}
       {preview && (
         <section className="step">
           <div className="step-header">
-            <span className="step-number">{selectedTemplate?.date_column ? 6 : 5}</span>
+            <span className="step-number">{selectedTemplate?.date_column ? 5 : 4}</span>
             <h3 className="step-title">PDF erstellen</h3>
           </div>
           <div className="step-body">

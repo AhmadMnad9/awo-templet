@@ -55,7 +55,8 @@
     "closing_wishes": "Der Vorstand",
     "assets": {
       "logo_image": "static/images/logo.jpg",
-      "signature_image": "static/images/signature.png"
+      "signature_image": "static/images/signature.png",
+      "watermark_image": "static/images/urkunde_watermark.png"
     }
   }
 ]

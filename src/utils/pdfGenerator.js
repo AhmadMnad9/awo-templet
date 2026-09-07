@@ -13,6 +13,9 @@ const themeColors = {
 };
 
 const styles = StyleSheet.create({
+  // ==========================================
+  // 1. Brief (Letter) Styles
+  // ==========================================
   page: {
     width: mmToPt(210),
     height: mmToPt(297),
@@ -140,7 +143,205 @@ const styles = StyleSheet.create({
     width: 140,
     height: 'auto',
   },
+
+  // ==========================================
+  // 2. Urkunde (Certificate) Styles - Senior Standard
+  // ==========================================
+  urkundePage: {
+    width: mmToPt(210),
+    height: mmToPt(297),
+    position: 'relative',
+    backgroundColor: '#ffffff',
+    fontFamily: 'Helvetica',
+    color: '#0f172a',
+  },
+  // Outer formal AWO red border
+  urkundeOuterBorder: {
+    position: 'absolute',
+    top: mmToPt(10),
+    left: mmToPt(10),
+    right: mmToPt(10),
+    bottom: mmToPt(10),
+    borderWidth: 2,
+    borderColor: '#e30613', // AWO Red
+  },
+  // Inner thin decorative accent border
+  urkundeInnerBorder: {
+    position: 'absolute',
+    top: mmToPt(13),
+    left: mmToPt(13),
+    right: mmToPt(13),
+    bottom: mmToPt(13),
+    borderWidth: 0.6,
+    borderColor: '#e30613',
+  },
+  // Logo top right
+  urkundeLogoContainer: {
+    position: 'absolute',
+    top: mmToPt(18),
+    right: mmToPt(18),
+    width: mmToPt(44),
+  },
+  urkundeLogo: {
+    width: '100%',
+    height: 'auto',
+  },
+  // Header / Title container
+  urkundeHeader: {
+    marginTop: mmToPt(34),
+    alignItems: 'center',
+  },
+  urkundeMainTitle: {
+    fontSize: 35,
+    fontWeight: 'bold',
+    color: '#e30613', // Official AWO Red
+    letterSpacing: 6,
+    textAlign: 'center',
+  },
+  urkundeDividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: mmToPt(3.5),
+    width: mmToPt(80),
+  },
+  urkundeDividerLine: {
+    flex: 1,
+    height: 0.8,
+    backgroundColor: '#e30613',
+  },
+  urkundeDividerDiamond: {
+    width: 4.5,
+    height: 4.5,
+    backgroundColor: '#e30613',
+    marginHorizontal: 6,
+    transform: 'rotate(45deg)',
+  },
+  urkundeSubtitle: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: '#334155',
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  // Recipient honor section
+  urkundeRecipientContainer: {
+    alignItems: 'center',
+    marginTop: mmToPt(18),
+    marginBottom: mmToPt(16),
+  },
+  urkundeAnrede: {
+    fontSize: 12,
+    color: '#64748b',
+    letterSpacing: 2.5,
+    textTransform: 'uppercase',
+    marginBottom: mmToPt(2),
+  },
+  urkundeName: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    letterSpacing: 0.6,
+  },
+  // Body text
+  urkundeBodyContainer: {
+    paddingHorizontal: mmToPt(26),
+    marginBottom: mmToPt(14),
+  },
+  urkundeParagraph: {
+    fontSize: 12,
+    lineHeight: 1.7,
+    textAlign: 'center',
+    color: '#1e293b',
+    marginBottom: mmToPt(6),
+  },
+  urkundeParagraphHighlight: {
+    fontSize: 12,
+    lineHeight: 1.7,
+    textAlign: 'center',
+    color: '#0f172a',
+    fontWeight: 'bold',
+    marginBottom: mmToPt(6),
+  },
+  // Official Watermark / Seal Stamp
+  urkundeWatermarkContainer: {
+    position: 'absolute',
+    top: mmToPt(173),
+    left: mmToPt(76.5),
+    width: mmToPt(57),
+    height: mmToPt(57),
+    opacity: 0.92,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  urkundeWatermark: {
+    width: '100%',
+    height: '100%',
+  },
+  // Footer
+  urkundeFooter: {
+    position: 'absolute',
+    bottom: mmToPt(22),
+    left: mmToPt(22),
+    right: mmToPt(22),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  urkundeDateContainer: {
+    width: 170,
+  },
+  urkundeDateCity: {
+    fontSize: 10.5,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 2,
+  },
+  urkundeDateText: {
+    fontSize: 9.5,
+    color: '#475569',
+  },
+  urkundeSignatureContainer: {
+    width: 195,
+    alignItems: 'center',
+  },
+  urkundeSignatureSpace: {
+    height: 36, // Blank space for manual pen signature
+  },
+  urkundeSignatureLine: {
+    width: '100%',
+    height: 0.8,
+    backgroundColor: '#94a3b8',
+    marginBottom: 5,
+  },
+  urkundeSignerName: {
+    fontSize: 10.5,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    textAlign: 'center',
+  },
+  urkundeSignerTitle: {
+    fontSize: 9,
+    color: '#475569',
+    textAlign: 'center',
+  },
 });
+
+function getAssetDataUri(assetRelPath) {
+  if (!assetRelPath) return null;
+  const absPath = path.join(process.cwd(), assetRelPath);
+  if (fs.existsSync(absPath)) {
+    try {
+      const ext = path.extname(absPath).toLowerCase().replace('.', '');
+      const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/png';
+      const base64 = fs.readFileSync(absPath, 'base64');
+      return `data:${mime};base64,${base64}`;
+    } catch (e) {
+      console.error("Error reading asset file:", absPath, e);
+    }
+  }
+  return null;
+}
 
 function getSalutations(briefanrede) {
   if (!briefanrede || typeof briefanrede !== 'string') {
@@ -183,7 +384,7 @@ function formatCustomText(text, salutations, row, year) {
   return formatted;
 }
 
-// Single Brief Component
+// 1. Brief Component
 const Brief = ({ row, templateConfig, data, year, index, total }) => {
   const salutations = getSalutations(row[templateConfig.salutation_column || "Briefanrede"]);
   
@@ -192,7 +393,6 @@ const Brief = ({ row, templateConfig, data, year, index, total }) => {
   const dateCol = templateConfig.date_column;
   if (dateCol && row[dateCol]) {
     const bdRaw = row[dateCol];
-    // if DD.MM.YYYY
     if (/^\d{2}\.\d{2}\.\d{4}$/.test(bdRaw)) {
       const parts = bdRaw.split('.');
       formattedDate = `${parts[0]}.${parts[1]}.${year}`;
@@ -214,23 +414,6 @@ const Brief = ({ row, templateConfig, data, year, index, total }) => {
   const renderedClosingWishes = formatCustomText(templateConfig.closing_wishes || "", salutations, row, year);
 
   const accentColor = themeColors[templateConfig.theme] || '#e30613';
-
-  // Resolve assets as base64 data URIs for robust offline rendering
-  const getAssetDataUri = (assetRelPath) => {
-    if (!assetRelPath) return null;
-    const absPath = path.join(process.cwd(), assetRelPath);
-    if (fs.existsSync(absPath)) {
-      try {
-        const ext = path.extname(absPath).toLowerCase().replace('.', '');
-        const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/png';
-        const base64 = fs.readFileSync(absPath, 'base64');
-        return `data:${mime};base64,${base64}`;
-      } catch (e) {
-        console.error("Error reading asset file:", absPath, e);
-      }
-    }
-    return null;
-  };
 
   const logoUri = getAssetDataUri(templateConfig.assets?.logo_image);
   const watermarkUri = getAssetDataUri(templateConfig.assets?.watermark_image);
@@ -322,19 +505,144 @@ const Brief = ({ row, templateConfig, data, year, index, total }) => {
   );
 };
 
+// 2. Urkunde (Certificate) Component
+const Urkunde = ({ row, templateConfig, data, year, index, total }) => {
+  // Anrede formatting for certificate (e.g. "Herrn" -> "Herr")
+  let anrede = row.Anrede || '';
+  if (anrede.toLowerCase() === 'herrn') anrede = 'Herr';
+  if (!anrede && row.Briefanrede) {
+    if (row.Briefanrede.toLowerCase().includes('herr') || row.Briefanrede.toLowerCase().includes('lieber')) anrede = 'Herr';
+    else if (row.Briefanrede.toLowerCase().includes('frau') || row.Briefanrede.toLowerCase().includes('liebe')) anrede = 'Frau';
+  }
+
+  const fullName = `${row.Vorname || ''} ${row.Nachname || ''}`.trim();
+  const formattedDate = new Date().toLocaleDateString('de-DE');
+
+  // Dynamic membership years from CSV (Jahre Mitglied or Jahre)
+  const membershipYears = row["Jahre Mitglied"] || row["Jahre"] || "40";
+  
+  let subtitle = templateConfig.subtitle || `${membershipYears}-jährige AWO-Mitgliedschaft`;
+  subtitle = subtitle.replaceAll("[Jahre]", membershipYears);
+  subtitle = subtitle.replace(/\s*-\s*jährige/g, '-jährige').replace(/AWO\s*-\s*Mitgliedschaft/g, 'AWO-Mitgliedschaft');
+
+  const subjectRaw = data.custom_subject || templateConfig.subject || "URKUNDE";
+  const paragraphsRaw = data.custom_paragraphs || templateConfig.paragraphs || [];
+
+  const renderedParagraphs = paragraphsRaw.map(p => {
+    let text = p.replaceAll("[Jahre]", membershipYears);
+    text = text.replace(/\{\{\s*row\.(\w+)\s*\}\}/g, (match, key) => row[key] || "");
+    return text;
+  });
+
+  const logoUri = getAssetDataUri(templateConfig.assets?.logo_image);
+  const watermarkUri = getAssetDataUri(templateConfig.assets?.watermark_image || "public/images/urkunde_watermark.png");
+
+  return (
+    <Page size="A4" style={styles.urkundePage}>
+      {/* Decorative Outer and Inner AWO Red Borders */}
+      <View style={styles.urkundeOuterBorder} />
+      <View style={styles.urkundeInnerBorder} />
+
+      {/* Official Watermark / Seal in the designated empty area */}
+      {watermarkUri && (
+        <View style={styles.urkundeWatermarkContainer}>
+          <Image style={styles.urkundeWatermark} src={watermarkUri} />
+        </View>
+      )}
+
+      {/* Logo placed at Top Right */}
+      {logoUri && (
+        <View style={styles.urkundeLogoContainer}>
+          <Image style={styles.urkundeLogo} src={logoUri} />
+        </View>
+      )}
+
+      {/* Header with Main Title, Diamond Divider, and Subtitle */}
+      <View style={styles.urkundeHeader}>
+        <Text style={styles.urkundeMainTitle}>{subjectRaw}</Text>
+        <View style={styles.urkundeDividerContainer}>
+          <View style={styles.urkundeDividerLine} />
+          <View style={styles.urkundeDividerDiamond} />
+          <View style={styles.urkundeDividerLine} />
+        </View>
+        {subtitle ? (
+          <Text style={styles.urkundeSubtitle}>{subtitle}</Text>
+        ) : null}
+      </View>
+
+      {/* Recipient Honor Section */}
+      <View style={styles.urkundeRecipientContainer}>
+        {anrede ? <Text style={styles.urkundeAnrede}>{anrede}</Text> : null}
+        <Text style={styles.urkundeName}>{fullName}</Text>
+      </View>
+
+      {/* Body Paragraphs */}
+      <View style={styles.urkundeBodyContainer}>
+        {renderedParagraphs.map((p, i) => (
+          <Text 
+            key={i} 
+            style={i === renderedParagraphs.length - 1 && renderedParagraphs.length > 1 
+              ? styles.urkundeParagraphHighlight 
+              : styles.urkundeParagraph}
+          >
+            {p}
+          </Text>
+        ))}
+      </View>
+
+      {/* Footer with Date and Manual Signature Area */}
+      <View style={styles.urkundeFooter}>
+        <View style={styles.urkundeDateContainer}>
+          <Text style={styles.urkundeDateCity}>Troisdorf – Oberlar</Text>
+          <Text style={styles.urkundeDateText}>den {formattedDate}</Text>
+        </View>
+        
+        <View style={styles.urkundeSignatureContainer}>
+          <View style={styles.urkundeSignatureSpace} />
+          <View style={styles.urkundeSignatureLine} />
+          <Text style={styles.urkundeSignerName}>
+            {templateConfig.closing_wishes ? templateConfig.closing_wishes.split(',')[0].trim() : "Birgit Biegel"}
+          </Text>
+          <Text style={styles.urkundeSignerTitle}>
+            {templateConfig.closing_wishes && templateConfig.closing_wishes.includes(',') 
+              ? templateConfig.closing_wishes.split(',').slice(1).join(',').trim() 
+              : "Vorsitzende AWO Oberlar e. V."}
+          </Text>
+        </View>
+      </View>
+    </Page>
+  );
+};
+
 // Main Document Component
-export const AWOBriefeDocument = ({ records, templateConfig, data, year }) => (
-  <Document>
-    {records.map((row, index) => (
-      <Brief
-        key={index}
-        row={row}
-        templateConfig={templateConfig}
-        data={data}
-        year={year}
-        index={index}
-        total={records.length}
-      />
-    ))}
-  </Document>
-);
+export const AWOBriefeDocument = ({ records, templateConfig, data, year }) => {
+  const isUrkunde = templateConfig.type === 'urkunde' || templateConfig.id === 'urkunde_standard';
+  
+  return (
+    <Document>
+      {records.map((row, index) => (
+        isUrkunde ? (
+          <Urkunde
+            key={index}
+            row={row}
+            templateConfig={templateConfig}
+            data={data}
+            year={year}
+            index={index}
+            total={records.length}
+          />
+        ) : (
+          <Brief
+            key={index}
+            row={row}
+            templateConfig={templateConfig}
+            data={data}
+            year={year}
+            index={index}
+            total={records.length}
+          />
+        )
+      ))}
+    </Document>
+  );
+};
